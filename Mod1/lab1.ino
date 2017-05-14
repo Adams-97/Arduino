@@ -1,53 +1,56 @@
-#define LEDPIN 12
+#define LED1 13
 #define SPEAKERPIN 11
-#define INPIN 2
-#define ANALOGPIN 0
+#define BUTTON 7
+#define analogPin 3    
 #define MIN_FREQ 100
 #define MAX_FREQ 1000
+// potentiometer wiper (middle terminal) connected to A3, NOT 3 in the digital I/O
 
-int state = 0;
-int pressed = 0;
-int isOn = 0;
-int potValue = 0;
+int flag = 0;
+int val = 0;           // variable to store the value read
 
-void setup() {
-  Serial.begin(9600);
-  
-  pinMode(LEDPIN, OUTPUT);
+void setup(){
+  pinMode(LED1,OUTPUT);
+  pinMode(BUTTON,INPUT);
   pinMode(SPEAKERPIN, OUTPUT);
-  pinMode(INPIN, INPUT);
+  
+  Serial.begin(9600);          //  setup serial
+
+  digitalWrite(LED1,LOW);
+  digitalWrite(LED2,LOW);
+
+  while(digitalRead(BUTTON)){}
+  delay(50);
+  while(!digitalRead(BUTTON)){}
 }
 
-void loop() {
-   if (digitalRead(INPIN) == HIGH && pressed == 1) {
-     if (state == 0) {
-       state = 1;
-     } else {
-       state = 0;
-     }
-     pressed = 0;
-   } else if (digitalRead(INPIN) == LOW) {
-     pressed = 1;
-   }
-   
-   if (state == 0) {
-     noTone(SPEAKERPIN);
-   } else {
-     digitalWrite(LEDPIN, LOW);
-   }
-   
-   potValue = analogRead(ANALOGPIN);
-   
-   if (state == 0) {
-    if (isOn == 0) {
-     digitalWrite(LEDPIN, HIGH);
-     isOn = 1;
-    } else {
-     digitalWrite(LEDPIN, LOW);
-     isOn = 0;
-    }
-    delay(potValue/1023.0 * 1000);
-   } else {
+void loop(){
+  if(flag==0){
+  val = analogRead(analogPin);    // read the input pin
+  Serial.println(val);             // debug value
+    
+    digitalWrite(LED1,HIGH);
+    delay(val);
+    digitalWrite(LED1,LOW);
+    delay(val);
+    
+    if(!digitalRead(BUTTON)){
+      while(!digitalRead(BUTTON)){}
+      flag = 1;
+      digitalWrite(LED1,LOW);
+      delay(50);
+      }
+  }
+    else if(flag==1){
     tone(SPEAKERPIN, (potValue/1023.0)*(MAX_FREQ - MIN_FREQ)+MIN_FREQ);
-   }
-}
+    if(!digitalRead(BUTTON)){
+      while(!digitalRead(BUTTON)){}
+      flag = 0;
+         noTone(SPEAKERPIN);
+      delay(50);
+      }
+  }
+  
+  
+  }
+
