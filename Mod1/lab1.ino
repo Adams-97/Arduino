@@ -1,3 +1,12 @@
+//Description
+
+/*
+When you press the button the LED will start blinking and when pressed again the Piezo will turn on
+*/
+
+
+
+
 #define LED1 13
 #define SPEAKERPIN 11
 #define BUTTON 7
